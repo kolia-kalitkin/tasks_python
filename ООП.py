@@ -5049,17 +5049,24 @@ class UpperPrintString(str):
     # obj — объект, определяющий начальное значение строки. Может быть не передан, в таком случае начальное значение считается пустой строкой
 # ---------------------------------------------------------------
 class LowerString(str):
-    def __init__(self, obj='') -> None:
-        
-        super().__init__(obj)          # вызываем инициализатор родительского класса
-                                        # Процесс создания экземпляра классаLowerString должен совпадать с процессом создания экземпляра класса str.
-    def __eq__()    
-        
+    def __new__(cls, string=''):
+        instance = super().__new__(cls, str(string).lower())
+        return instance
 
-    def __str__(self):
-        return self.lower()
+s1 = LowerString('BEEGEEK')
+s2 = LowerString('BeeGeek')
+
+print(s1)
+print(s2)
+print(s1 == s2)
+print(issubclass(LowerString, str))
+
 # ---------------------------------------------------------------
-
+class LowerString(str):
+    def __new__(cls, obj=''):
+        obj = str(obj).lower()
+        instance = super().__new__(cls, obj)
+        return instance
 # ---------------------------------------------------------------
 
 
@@ -5208,7 +5215,9 @@ class SuperInt(int):
         else:
             num = -int(f'{abs(self)}' * n)
         return SuperInt(num)
-
+    
+    # или так можно реализовать метод
+    
     # def repeat(self, n=2):
     #     digit = f"{'-' * (self < 0)}{f'{abs(self)}' * n}"
     #     return type(self)(digit)
@@ -5274,6 +5283,320 @@ class RoundedInt(int):
 # 805
 # Реализуйте класс AdvancedTuple, наследника класса tuple, который описывает кортеж, умеющий выполнять операцию сложения (+, +=) не только с экземплярами классов AdvancedTuple и tuple, но и с любыми итерируемыми объектами. Процесс создания экземпляра класса AdvancedTuple должен совпадать с процессом создания экземпляра класса tuple.
 # Примечание 1. Как бы ни выполнялось сложение, с помощью оператора + или +=, результатом операции должен являться новый экземпляр класса AdvancedTuple.
+# ---------------------------------------------------------------
+class AdvancedTuple(tuple):   
+    
+    def __init__(self, iterable) -> None:        
+        self.iterable = tuple(iterable)
+
+    
+    def __add__(self, other):        
+        if hasattr(other, '__iter__'):
+            return AdvancedTuple(self.iterable + tuple(other))   
+        return NotImplemented
+    
+        
+    def __radd__(self, other):        
+        return AdvancedTuple(tuple(other) + self.iterable)
+
+
+    def __iadd__(self, other):       
+        return self.__add__(other)
+    
+
+advancedtuple = AdvancedTuple([1, 2, 3])
+
+print(advancedtuple + (4, 5))
+print(advancedtuple + [4, 5])
+print({'a': 1, 'b': 2} + advancedtuple)
+
+# -------------преп--------------------------------------------
+class AdvancedTuple(tuple):
+    def __add__(self, other):
+        if hasattr(other, '__iter__'):
+            return AdvancedTuple(tuple(self) + tuple(other))
+        return NotImplemented
+
+    def __radd__(self, other):
+        if hasattr(other, '__iter__'):
+            return AdvancedTuple(tuple(other) + tuple(self))
+        return NotImplemented
+
+    def __iadd__(self, other):
+        if hasattr(other, '__iter__'):
+            return AdvancedTuple(tuple(self) + tuple(other))
+        return NotImplemented
+# ---------------------------------------------------------------
+
+
+# Класс ModularTuple
+# 852
+# Реализуйте класс ModularTuple, наследника класса tuple, описывающий кортеж, элементы которого во время создания автоматически делятся с остатком на заданное число. При создании экземпляра класс должен принимать два аргумента в следующем порядке:
+#     iterable — итерируемый объект, определяющий начальный набор элементов экземпляра класса ModularTuple. Если не передан, начальный набор элементов считается пустым
+#     size — целое число, на которое делятся с остатком все элементы создаваемого экземпляра класса ModularTuple, по умолчанию имеет значение 100
+# Примечание 1. Экземпляр класса ModularTuple не должен зависеть от итерируемого объекта, на основе которого он был создан. Другими словами, если исходный итерируемый объект изменится, то экземпляр класса ModularTuple измениться  не должен.
+# Примечание 2. Дополнительная проверка данных на корректность не требуется. Гарантируется, что реализованный класс используется только с корректными данными.
+# ---------------------------------------------------------------
+class ModularTuple(tuple):
+    """All elements divide by number"""
+
+    def __new__(cls, iterable=None, size=100):    # Наследование от встроенных классов ничем не отличается от наследования от собственных классов, то есть мы так же получаем все методы и атрибуты родительского класса
+        if iterable:
+            iterable1 = (i % size for i in iterable)       
+            instance = super().__new__(cls, iterable1)        
+            return instance
+        return super().__new__(cls)
+
+# ------тест---------------------------------------------------------
+modulartuple = ModularTuple([1, 2, 3, 4, 5], 2)
+
+print(modulartuple)
+# -----преп-----------------------------------------------------
+class ModularTuple(tuple):
+    def __new__(cls, iterable, *args, size=100, **kwargs):              # Наследование от встроенных классов ничем не отличается от наследования от собственных классов, то есть мы так же получаем все методы и атрибуты родительского класса
+        iterable = map(lambda item: item % size, iterable)
+        instance = super().__new__(cls, iterable)
+        return instance
+
+# ---------------------------------------------------------------
+
+
+# Класс DefaultList
+# 
+# Реализуйте класс DefaultList, наследника класса UserList, описывающий список, который при попытке получить элемент по несуществующему индексу возвращает значение по умолчанию. При создании экземпляра класс должен принимать два аргумента в следующем порядке:
+#     iterable — итерируемый объект, определяющий начальный набор элементов экземпляра класса DefaultList. Если не передан, начальный набор элементов считается пустым
+#     default — значение, возвращаемое при попытке получить элемент по несуществующему индексу. По умолчанию равняется None
+# Примечание 1. Экземпляр класса DefaultList не должен зависеть от итерируемого объекта, на основе которого он был создан. Другими словами, если исходный итерируемый объект изменится, то экземпляр класса DefaultList измениться  не должен.
+# ---------------------------------------------------------------
+
+from collections import UserList     # Класс UserList – это удобная обертка для обычного объекта list. 
+                                     # Этот класс обеспечивает то же поведение, что list, 
+                                     # с дополнительной возможностью предоставления доступа к базовому списку через атрибут экземпляра data.
+
+class DefaultList(UserList):
+    
+    def __init__(self, iterable=[], default=None):
+        super().__init__(item for item in iterable)
+        self.default = default
+
+    def __getitem__(self, index):
+        if not (0 <= index < len(self.data)  or -len(self.data) <= index <= -1):  # доступа к базовому списку через атрибут экземпляра data
+            return self.default
+        return self.data[index]
+    
+    #def __setitem__(self, index, item):
+    #    self.data[index] = str(item)
+# ------------преп---------------------------------------------------
+from collections import UserList
+
+
+class DefaultList(UserList):
+    """
+    Класс DefaultList
+    """
+
+    def __init__(self, iterable=(), default=None):
+        super().__init__(item for item in iterable)
+        self._default = default
+
+    def __getitem__(self, key):
+        try:
+            return super().__getitem__(key)
+        except IndexError:
+            return self._default
+# ---------------------------------------------------------------
+
+
+
+# Класс EasyDict
+# 865
+# Реализуйте класс EasyDict, наследника класса dict, описывающий словарь, значения элементов которого можно получать как по ключам ([key]), так и по одноименным атрибутам (.key). Процесс создания экземпляра класса EasyDict должен совпадать с процессом создания экземпляра класса dict.
+# ---------------------------------------------------------------
+class EasyDict(dict):
+    """словарь, значения элементов которого можно получать как по ключам, так и по одноименным атрибутам"""
+
+
+    def __init__(self, items, **kwargs):
+        self.update(items)
+        self.update(kwargs)
+        for name_attr, value_attr in self.items():
+            setattr(self, name_attr, value_attr)
+
+      
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+        super().__setitem__(key, value)
+
+# ---------------------------------------------------------------
+class EasyDict(dict):    
+    __getattr__ = dict.__getitem__
+# ---------------------------------------------------------------
+class EasyDict(dict):
+    def __getattr__(self, item):
+        return self.get(item)
+# ---------------------------------------------------------------
+class EasyDict(dict):
+    def __getattr__(self, item):
+        return super().__getitem__(item)
+# ---------------------------------------------------------------
+
+# Класс TwoWayDict
+# 857
+# Реализуйте класс TwoWayDict, наследника класса UserDict, описывающий двунаправленный словарь, в который при добавлении пары ключ: значение также добавляется и пара значение: ключ. Процесс создания экземпляра класса TwoWayDict должен совпадать с процессом создания экземпляра класса UserDict.
+# ---------------------------------------------------------------
+from collections import UserDict
+                # Класс UserDict – это удобная обертка для обычного объекта dict. Этот класс обеспечивает то же поведение, что и dict, с дополнительной возможностью предоставления доступа к базовому словарю через атрибут экземпляра data.
+                
+class TwoWayDict(UserDict):
+    def __setitem__(self, key, value):        
+        self.data.__setitem__(key, value)
+        self.data.__setitem__(value, key)
+
+# ---------преп---------------------------------------------------
+from collections import UserDict
+
+class TwoWayDict(UserDict):
+    def __setitem__(self, key, value):
+        self.data[key] = value
+        self.data[value] = key
+# ---------------------------------------------------------------
+
+
+
+# Класс AdvancedList
+# 
+# Реализуйте класс AdvancedList, наследника класса list, описывающий список с дополнительным функционалом. Процесс создания экземпляра класса AdvancedList должен совпадать с процессом создания экземпляра класса list.
+# Класс AdvancedList должен иметь три метода экземпляра:
+#     join() — метод, объединяющий все элементы экземпляра класса AdvancedList в строку и возвращающий полученный результат. Метод должен принимать один строковый аргумент, по умолчанию равный пробелу, который является разделителем элементов списка в результирующей строке
+#     map() — метод, принимающий в качестве аргумента функцию func и применяющий ее к каждому элементу экземпляра класса AdvancedList. Метод должен изменять исходный экземпляр класса AdvancedList, а не возвращать новый
+#     filter() — метод, принимающий в качестве аргумента функцию func и удаляющий из экземпляра класса AdvancedList те элементы, для которых функция func вернула значение False. Метод должен изменять исходный экземпляр класса AdvancedList, а не возвращать новый
+# Примечание 1. Дополнительная проверка данных на корректность не требуется. Гарантируется, что реализованный класс используется только с корректными данными.
+# Примечание 2. Никаких ограничений касательно реализации класса AdvancedList нет, она может быть произвольной.
+# ---------------------------------------------------------------
+
+from collections import UserList
+
+class AdvancedList(UserList):
+    def join(self, separator=' '):
+        return f'{separator}'.join(str(i) for i in self)
+
+    def map(self, func):
+        for i in range(len(self.data)):
+            i = super().__setitem__(i, func(self.data[i]))
+
+    def filter(self, func):
+        for i in range(-len(self.data), 0):  # удаляем (с конца списка к началу)
+            if not func(self.data[i]):
+                    self.data.pop(i)
+# ---------------------------------------------------------------
+class AdvancedList(list):
+
+    def join(self, sep=' '):
+        return sep.join(map(str, self))
+
+    def map(self, func):
+        self[:] = [func(i) for i in self]
+        
+    def filter(self, func):
+        self[:] = [i for i in self if func(i)]
+# ---------------------------------------------------------------
+# ---------------------------------------------------------------
+
+
+
+# Класс NumberList
+#
+# Реализуйте класс NumberList, наследника класса UserList, описывающий список, элементами которого могут быть лишь числа. При создании экземпляра класс должен принимать один аргумент:
+#     iterable — итерируемый объект, определяющий начальный набор элементов экземпляра класса NumberList. Если хотя бы один элемент переданного итерируемого объекта не является числом, должно быть возбуждено исключение TypeError с текстом:
+#     Элементами экземпляра класса NumberList должны быть числа
+#     Итерируемый объект может быть не передан, в таком случае начальный набор элементов считается пустым
+# При изменении экземпляра класса NumberList с помощью индексов, операций сложения (+, +=) и методов append(), extend() и insert() должна производиться проверка на то, что добавляемые элементы являются числами, в противном случае должно возбуждаться исключение TypeError с текстом:
+# Элементами экземпляра класса NumberList должны быть числа
+# Примечание 1. Числами будем считать экземпляры классов int и float.
+# Примечание 2. Экземпляр класса NumberList не должен зависеть от итерируемого объекта, на основе которого он был создан. Другими словами, если исходный итерируемый объект изменится, то экземпляр класса NumberList измениться  не должен.
+# ---------------------------------------------------------------
+from collections import UserList
+
+class NumberList(UserList):
+    def __init__(self, iterable=[]):
+        super().__init__(iterable)
+
+        if filter(lambda x: not(self.is_valid_type(x)), iterable) and iterable:
+            raise TypeError('Элементами экземпляра класса NumberList должны быть числа')
+
+    
+    
+    def __setitem__(self, index, item):
+        if self.is_valid_type(item):
+            self.data[index] = item
+
+    def insert(self, index, item):
+        if self.is_valid_type(item):
+            self.data.insert(index, item)
+
+    def append(self, item):
+        if isinstance(item, type(self)):
+            for i in item:
+                if self.is_valid_type(i):
+                    continue
+
+    def extend(self, other):
+        if isinstance(other, type(self)):
+            for i in other:
+                if self.is_valid_type(i):
+                    continue
+            
+            self.data.extend(other)
+          
+
+
+    def __add__(self, other):        
+        if isinstance(other, self):
+            return self.extend(other)
+        return NotImplemented
+
+        
+    def __iadd__(self, other):       
+        return self.extend(other)
+
+
+    @staticmethod
+    def is_valid_type(other):
+        if  isinstance(other, (int, float)):
+            return True
+        raise TypeError('Элементами экземпляра класса NumberList должны быть числа')    
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+#
+#
+#
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+#
+#
+#
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+#
+#
+#
 # ---------------------------------------------------------------
 
 # ---------------------------------------------------------------
