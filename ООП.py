@@ -4203,12 +4203,20 @@ class ReversedSequence:
 # Экземпляр класса SparseArray должен позволять получать и изменять значения своих элементов с помощью индексов. При попытке получить значение элемента по несуществующему индексу должно быть возвращено значение по умолчанию.
 # Примечание 1. Гарантируется, что при доступе к элементам используются только неотрицательные индексы.
 # ---------------------------------------------------------------
+
 class SparseArray:
     def __init__(self, default) -> None:
         self.default = default
-
-    def __len__(self):
-        return len(self)
+        self.collection = {}
+        
+        
+    def __getitem__(self, key):     # определяет поведение при доступе к элементу, используя синтаксис self[key]
+        self.collection.setdefault(key, self.default)        
+        return self.collection[key]         
+        
+        
+    def __setitem__(self, key, value):        
+        self.collection[key] = value 
 # ---------------------------------------------------------------
 
 # ---------------------------------------------------------------
@@ -4229,47 +4237,87 @@ class SparseArray:
 # Примечание 2. Экземпляр класса CyclicList не должен зависеть от итерируемого объекта, на основе которого он был создан. Другими словами, если исходный итерируемый объект изменится, то экземпляр класса CyclicList измениться  не должен.
 # ---------------------------------------------------------------
 
-# from itertools import cycle
+from itertools import cycle
 
-# class CyclicList:
-#     def __init__(self, iterable) -> None:
-#         self.iterable = iterable
+class CyclicList:
+    def __init__(self, iterable=[]) -> None:
+        self.iterable = iterable[:]
 
-#     def append():
-#         """метод, принимающий в качестве аргумента произвольный объект и добавляющий его в конец циклического списка """
+    def append(self, elem):
+        """метод, принимающий в качестве аргумента произвольный объект и добавляющий его в конец циклического списка """
+        self.iterable.append(elem)
 
-#     def pop():
-#         """метод, который принимает в качестве аргумента индекс элемента циклического списка, возвращает его значение и удаляет из циклического списка элемент с данным индексом. Если аргумент не передан, возвращаемым и удаляемым элементом считается последний элемент циклического списка  """
 
-#     def __len__(self):
-#         return len(self.cart)
+    def pop(self, elem=-1):
+        """метод, который принимает в качестве аргумента индекс элемента циклического списка, возвращает его значение и удаляет из циклического списка элемент с данным индексом. Если аргумент не передан, возвращаемым и удаляемым элементом считается последний элемент циклического списка  """
+        return self.iterable.pop(elem)
+    
+    def __iter__(self):        
+        while True:
+            yield from self.iterable
 
-#     def __getitem__(self, key):
-#         if not isinstance(key, int):
-#             raise TypeError('Индекс должен быть целым числом')
-#         if key < 0 or key >= len(self.cart):
-#             raise IndexError('Неверный индекс')
-#         return self.cart[key]
+    def __len__(self):
+        return len(self.iterable)
 
-#     def __setitem__(self, key, value):
-#         key = self.check_key(key)
-#         self.cart[key] = value
+    def __getitem__(self, key):
+        
+        if not isinstance(key, int):
+            raise TypeError('Индекс должен быть целым числом')
+        if key > len(self.iterable):
+            key = key % len(self.iterable)
+        return self.iterable[key]
 
-#     def __delitem__(self, key):
-#         key = self.check_key(key)
-#         del self.cart[key]
+    def __setitem__(self, key, value):        
+        self.iterable[key] = value
 
+
+#------тест--------
+cyclic_list = CyclicList()
+cyclic_list.append(1)
+
+for index, elem in enumerate(cyclic_list):
+    if index > 6:
+        break
+    print(elem, end=' ')
+# ------преп----------------------------------------------------
+from itertools import cycle
+
+
+class CyclicList:
+    def __init__(self, iterable=()):
+        self._data = list(iterable) or []
+
+    def append(self, item):
+        self._data.append(item)
+
+    def pop(self, index=None):
+        if index is None:
+            return self._data.pop()
+        return self._data.pop(index)
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        yield from cycle(self._data)
+
+    def __getitem__(self, index):
+        return self._data[index % len(self._data)]
 # ---------------------------------------------------------------
-# не законченая 
+
+
+
+# Класс SequenceZip
+# 802
+# Реализуйте класс SequenceZip. При создании экземпляра класс должен принимать произвольное количество позиционных аргументов, каждый из которых является последовательностью. Класс SequenceZip должен описывать последовательность, элементами которой являются элементы переданных в конструктор итерируемых объектов, объединенные в кортежи. Объединение должно происходить аналогично тому, как это делает функция zip().
+# При передаче экземпляра класса SequenceZip в функцию len() должно возвращаться количество элементов в нем.
+# Также экземпляр класса SequenceZip должен быть итерируемым объектом, то есть позволять перебирать свои элементы, например, с помощью цикла for.
+# Наконец, экземпляр класса SequenceZip должен позволять получать значения своих элементов с помощью индексов.
+# Примечание 1. Гарантируется, что при доступе к элементам используются только неотрицательные индексы.
+# Примечание 2. Экземпляр класса SequenceZip не должен зависеть от последовательностей, на основе которых он был создан. Другими словами, если исходные последовательности изменятся, то экземпляр класса SequenceZip измениться  не должен.
 # ---------------------------------------------------------------
-
-
-
-# 
-# 
-# 
-# ---------------------------------------------------------------
-
+class SequenceZip:
+    
 # ---------------------------------------------------------------
 
 # ---------------------------------------------------------------
@@ -5518,64 +5566,77 @@ class AdvancedList(list):
 from collections import UserList
 
 class NumberList(UserList):
-    def __init__(self, iterable=[]):
-        super().__init__(iterable)
+    def __init__(self, iterable=None):
+        super().__init__()
+        if iterable is not None:
+            self._check_elements(iterable)
+            self.data = list(iterable)
 
-        if filter(lambda x: not(self.is_valid_type(x)), iterable) and iterable:
-            raise TypeError('Элементами экземпляра класса NumberList должны быть числа')
+    def _check_elements(self, iterable):
+        if not all(isinstance(item, (int, float)) for item in iterable):
+            raise TypeError("Элементами экземпляра класса NumberList должны быть числа")
 
-    
-    
-    def __setitem__(self, index, item):
-        if self.is_valid_type(item):
-            self.data[index] = item
+    def __setitem__(self, key, value):
+        self._check_elements([value])
+        super().__setitem__(key, value)
 
-    def insert(self, index, item):
-        if self.is_valid_type(item):
-            self.data.insert(index, item)
+    def __add__(self, other):
+        self._check_elements(other)
+        return super().__add__(other)
+
+    def __iadd__(self, other):
+        self._check_elements(other)
+        return super().__iadd__(other)
 
     def append(self, item):
-        if isinstance(item, type(self)):
-            for i in item:
-                if self.is_valid_type(i):
-                    continue
+        self._check_elements([item])
+        super().append(item)
 
-    def extend(self, other):
-        if isinstance(other, type(self)):
-            for i in other:
-                if self.is_valid_type(i):
-                    continue
+    def extend(self, iterable):
+        self._check_elements(iterable)
+        super().extend(iterable)
+
+    def insert(self, index, item):
+        self._check_elements([item])
+        super().insert(index, item)    
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+# Класс ValueDict
+# 833
+# Реализуйте класс ValueDict, наследника класса dict, описывающий словарь c дополнительным функционалом. Процесс создания экземпляра класса ValueDict должен совпадать с процессом создания экземпляра класса dict.
+# Класс ValueDict должен иметь два метода экземпляра:
+#     key_of() — метод, принимающий в качестве аргумента объект value и возвращающий первый ключ экземпляра класса ValueDict, имеющий значение value. Если такого ключа нет, метод должен вернуть None.
+#     keys_of() — метод, принимающий в качестве аргумента объект value и возвращающий итерируемый объект, элементами которого являются все ключи экземпляра класса ValueDict, имеющие значение value
+# Примечание 1. Дополнительная проверка данных на корректность не требуется. Гарантируется, что реализованный класс используется только с корректными данными.
+# ---------------------------------------------------------------
+class ValueDict(dict):
+    def key_of(self, value=None):
+        if value in self.values():            
+            for key, val in self.items():
+                if val == value:
+                    return key     
             
-            self.data.extend(other)
-          
-
-
-    def __add__(self, other):        
-        if isinstance(other, self):
-            return self.extend(other)
-        return NotImplemented
-
         
-    def __iadd__(self, other):       
-        return self.extend(other)
+    def keys_of(self, value):
+        l1 = [key_self for key_self, value_self in self.items() if value_self == value]
+        return l1
+#--------
+data = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13,
+        'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22, 'w': 23, 'x': 24, 'y': 25,
+        'z': 26, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 'K': 11, 'L': 12,
+        'M': 13, 'N': 14, 'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 'T': 20, 'U': 21, 'V': 22, 'W': 23, 'X': 24,
+        'Y': 25, 'Z': 26}
 
 
-    @staticmethod
-    def is_valid_type(other):
-        if  isinstance(other, (int, float)):
-            return True
-        raise TypeError('Элементами экземпляра класса NumberList должны быть числа')    
+valuedict = ValueDict(data)
 
-# ---------------------------------------------------------------
-
-# ---------------------------------------------------------------
-
-
-
-#
-#
-#
-# ---------------------------------------------------------------
+print(valuedict.key_of(21))
+print(*valuedict.keys_of(17))
 
 # ---------------------------------------------------------------
 
@@ -5583,24 +5644,110 @@ class NumberList(UserList):
 
 
 
-#
-#
-#
+# Класс BirthdayDict
+# 824
+# Реализуйте класс BirthdayDict, наследника класса UserDict, описывающий словарь с информацией о днях рождения, ключами в котором являются имена, а значениями — даты дней рождения. Процесс создания экземпляра класса BirthdayDict должен совпадать с процессом создания экземпляра класса UserDict.
+# При добавлении новой пары ключ: значение в экземпляр класса BirthdayDict должна производиться проверка на наличие в этом экземпляре пары, которая имеет такое же значение, что и добавляемая пара. И если такая пара есть, должен выводиться текст:
+# Хей, <ключ добавляемой пары>, не только ты празднуешь день рождения в этот день!
+# Аналогичное поведение должно быть и при изменении значения по ключу.
+# ---------------------------------------------------------------
+from collections import UserDict
+
+
+class BirthdayDict(UserDict):
+    def __setitem__(self, key, value):
+        if value in self.data.values():
+            print(f'Хей, {key}, не только ты празднуешь день рождения в этот день!')           
+        
+        self.data.__setitem__(key, value)
+
+
+# ----тест -----------
+from datetime import date
+
+birthdaydict = BirthdayDict()
+
+birthdaydict['Боб'] = date(1987, 6, 15)
+birthdaydict['Том'] = date(1984, 7, 15)
+birthdaydict['Мария'] = date(1987, 6, 15)
+
 # ---------------------------------------------------------------
 
 # ---------------------------------------------------------------
 
+
+
+# Класс MutableString
+# 798
+# Реализуйте класс MutableString, наследника класса UserString, описывающий изменяемую строку. Процесс создания экземпляра класса MutableString должен совпадать с процессом создания экземпляра класса UserString.
+# Класс MutableString должен иметь три метода экземпляра:
+#     lower() — метод, переводящий все символы изменяемой строки в нижний регистр
+#     upper() — метод, переводящий все символы изменяемой строки в верхний регистр
+#     sort() — метод, сортирующий символы изменяемой строки. Может принимать два необязательных именованных аргумента key и reverse, выполняющих ту же задачу, что и в функции sorted()
+# Экземпляр класса MutableString должен позволять получать, изменять и удалять значения своих элементов с помощью индексов, причем как положительных, так и отрицательных.
 # ---------------------------------------------------------------
+from collections import UserString
+
+class MutableString(UserString):
+    def lower(self):
+        self.data = ''.join([i.lower() for i in self.data])         
+        return self.data  # везде работаем с self.data
+    
+    def upper(self):
+        self.data = ''.join([i.upper() for i in self.data])         
+        return self.data
+
+    def sort(self, key=None, reverse=False): 
+        self.data = ''.join(sorted(list(self.data), key=key, reverse=reverse))
+        return self.data
+
+    def __delitem__(self, key):
+        tmp = self._set_or_del(key)
+        self.data = ''.join(tmp)
+
+    def __setitem__(self, key, value):
+        tmp = self._set_or_del(key, value)
+        self.data = ''.join(tmp)
+
+    def __getitem__(self, key):
+        return MutableString(self._string[key])
+    
+    def _set_or_del(self, key, value=None):
+        """метод _set_or_del(), в котором и осуществляется либо удаление, либо установка значения по индексу или срезу"""
+        tmp = list(self.data)
+        if value:
+            tmp[key] = value
+        else:
+            del tmp[key]
+        return tmp
+
+# см. решение задачи ниже 
+# https://stepik.org/lesson/805785/step/18?thread=solutions&unit=816644
+
+    
+# -----преп----------------------------------------------------
+from collections import UserString
 
 
+class MutableString(UserString):
+    def __setitem__(self, index, value):
+        data_as_list = list(self.data)
+        data_as_list[index] = value
+        self.data = "".join(data_as_list)
 
-#
-#
-#
-# ---------------------------------------------------------------
+    def __delitem__(self, index):
+        data_as_list = list(self.data)
+        del data_as_list[index]
+        self.data = "".join(data_as_list)
 
-# ---------------------------------------------------------------
+    def upper(self):
+        self.data = self.data.upper()
 
+    def lower(self):
+        self.data = self.data.lower()
+
+    def sort(self, key=None, reverse=False):
+        self.data = "".join(sorted(self.data, key=key, reverse=reverse))
 # ---------------------------------------------------------------
 
 
@@ -5874,7 +6021,9 @@ class Knight(ChessPiece):
 # ---------------------------------------------------------------
 from abc import ABC, abstractmethod
 
-# class Validator(ABC):
+class Validator(ABC):
+
+
 
 
 
