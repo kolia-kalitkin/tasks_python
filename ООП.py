@@ -7195,65 +7195,326 @@ class Conference:
 
 
 
+# Класс Shape
 # 
-# 
-# 
+# Реализуйте класс Shape, описывающий геометрическую фигуру. При создании экземпляра класс должен принимать три аргумента в следующем порядке:
+#     name — название фигуры
+#     color — цвет фигуры
+#     area — площадь фигуры
+# Экземпляр класса Shape должен иметь три атрибута:
+#     name — название фигуры
+#     color — цвет фигуры
+#     area — площадь фигуры
+# Помимо приведенных выше трех атрибутов, экземпляр класса Shape не должен иметь возможности получить какие-либо другие атрибуты.
+# Также экземпляр класса Shape должен иметь следующее неформальное строковое представление:
+# <цвет фигуры> <название фигуры> (<площадь фигуры>)
+# Наконец, экземпляры класса Shape должны поддерживать между собой все операции сравнения с помощью операторов ==, !=, >, <, >=, <=. Две фигуры считаются равными, если их площади совпадают. Фигура считается больше другой фигуры, если ее площадь больше.
+# Примечание 1. Если объект, с которым выполняется операция сравнения, некорректен, метод, реализующий эту операцию, должен вернуть константу NotImplemented.
+# Примечание 2. Дополнительная проверка данных на корректность не требуется. Гарантируется, что реализованный класс используется только с корректными данными.
+# ---------------------------------------------------------------
+from functools import total_ordering
+
+
+@total_ordering
+class Shape:
+    """
+    класс Shape, описывающий геометрическую фигуру
+    """
+    __slots__= ('name','color', 'area')
+
+    def __init__(self, name: str, color: str, area: int | float) -> None:
+        self.name = name
+        self.color = color
+        self.area = area
+    
+    def __str__(self) -> str:
+        return f'{self.color} {self.name} ({self.area})'
+
+    
+    def __eq__(self, other: 'Shape') -> bool:
+        if isinstance(other, Shape):
+            return self.area == other.area
+        return NotImplemented
+    
+    
+    def __lt__(self, other: 'Shape') -> bool:
+        if isinstance(other, Shape):
+            return self.area < other.area
+        return NotImplemented
+
+# ------------
+shape = Shape('triangle', 'red', 12)
+
+print(shape.name)
+print(shape.color)
+print(shape.area)
+
+print(Shape('rectangle', 'green', 12) == Shape('triangle', 'red', 12))
+print(Shape('triangle', 'red', 15) > Shape('triangle', 'red', 12))
+print(Shape('Square', 'Red', 4))
+
+
+shape = Shape('triangle', 'red', 12)
+try:
+    shape.perimeter = 9
+except AttributeError:
+    print('Error')
+
 # ---------------------------------------------------------------
 
 # ---------------------------------------------------------------
 
+
+# Класс HTTPStatusCodes
+# 828
+# Коды состояния HTTP представляют собой трехзначные целые числа и используются для указания успешности конкретного HTTP запроса. Выделяют пять групп кодов состояния:
+#     информация (100-199)
+#     успех (200-299)
+#     перенаправление (300-399)
+#     ошибка клиента (400-499)
+#     ошибка сервера (500-599)
+# Реализуйте класс HTTPStatusCodes, описывающий перечисление с  кодами состояния HTTP. Перечисление должно иметь пять элементов:
+#     CONTINUE — элемент со значением 100
+#     OK — элемент со значением 200
+#     USE_PROXY — элемент со значением 305
+#     NOT_FOUND — элемент со значением 404
+#     BAD_GATEWAY — элемент со значением 502
+# Элемент перечисления должен иметь два метода:
+#     info() — метод, возвращающий двухэлементный кортеж, содержащий имя элемента и его значение
+#     code_class() — метод, возвращающий название группы на русском, к которой относится элемент
+# ---------------------------------------------------------------
+
+from enum import Enum
+
+
+class HTTPStatusCodes(Enum):    
+    CONTINUE = 100
+    OK = 200
+    USE_PROXY = 305
+    NOT_FOUND = 404
+    BAD_GATEWAY = 502
+
+    
+
+    def info(self):
+        return (self.name, self.value)
+    
+    
+     
+    def code_class(self):      
+        GROUP = {range(100,200): 'информация ',
+            range(200,300): 'успех ',
+            range(300,400): 'перенаправление',
+            range(400,500): 'ошибка клиента',
+            range(500,600): 'ошибка сервера '}
+
+        for i in GROUP:
+            if self.value in i:
+                return GROUP[i]
+# ---------------------------------------------------------------
+from enum import Enum
+
+
+class HTTPStatusCodes(Enum):
+    CONTINUE = 100
+    OK = 200
+    USE_PROXY = 305
+    NOT_FOUND = 404
+    BAD_GATEWAY = 502
+
+    def info(self):
+        return self.name, self.value
+
+    def code_class(self):
+        groups = ('информация', 'успех', 'перенаправление', 'ошибка клиента', 'ошибка сервера')
+        codes = dict(zip(HTTPStatusCodes, groups))
+        return codes[self]
 # ---------------------------------------------------------------
 
 
 
-# 
-# 
-# 
+# Класс Seasons
+# 819
+# Реализуйте класс Seasons, описывающий перечисление с временами года. Перечисление должно иметь четыре элемента:
+#     WINTER — элемент со значением 1
+#     SPRING — элемент со значением 2
+#     SUMMER — элемент со значением 3
+#     FALL — элемент со значением 4
+# Элемент перечисления должен иметь один метод:
+#     text_value() — метод, принимающий в качестве аргумента код страны en или ru и возвращающий строковое значение элемента в зависимости от переданного аргумента. Для WINTER en и ru значениями являются winter и зима соответственно, для SPRING — spring и весна, для SUMMER — summer и лето, для FALL — fall и осень
 # ---------------------------------------------------------------
 
+from enum import Enum
+
+class Seasons(Enum):
+    
+    WINTER = 1
+    SPRING = 2
+    SUMMER = 3
+    FALL = 4
+
+    def text_value(self, code: str):
+        code_country_en = ('winter', 'spring', 'summer', 'fall')
+        code_country_ru = ('зима', 'весна', 'лето', 'осень')
+        
+        if code == 'ru':        
+            return code_country_ru[self.value - 1]
+        elif code == 'en':
+            return code_country_en[self.value - 1]
+# ---------------------------------------------------------------
+from enum import Enum
+
+
+class Seasons(Enum):
+    WINTER = 1
+    SPRING = 2
+    SUMMER = 3
+    FALL = 4
+    
+    def text_value(self, lang):
+        times_year = {
+            'WINTER': ('winter', 'зима'),
+            'SPRING': ('spring', 'весна'),
+            'SUMMER': ('summer', 'лето'),
+            'FALL': ('fall', 'осень')
+        }
+        return times_year[self.name][lang == 'ru']
 # ---------------------------------------------------------------
 
+
+
+# Классы Weekday и NextDate
+# 662
+# 1. Реализуйте класс Weekday, описывающий перечисление с днями недели. Перечисление должно иметь семь элементов:
+
+#     MONDAY — элемент со значением 0
+#     TUESDAY — элемент со значением 1
+#     WEDNESDAY — элемент со значением 2
+#     THURSDAY — элемент со значением 3
+#     FRIDAY — элемент со значением 4
+#     SATURDAY — элемент со значением 5
+#     SUNDAY — элемент со значением 6
+
+# 2. Также реализуйте класс NextDate, позволяющий определять дату следующего дня недели, начиная с текущего дня. При создании экземпляра класс должен принимать три аргумента в следующем порядке:
+#     today — дата текущего дня, представленная экземпляром класса date
+#     weekday — день недели, представленный элементом перечисления Weekday
+#     after_today — булево значение, по умолчанию равняется False
+# Параметр after_today должен определять, учитывается ли текущая дата при определении даты следующего дня недели. Если он имеет значение False, текущая дата не должна учитываться, если True — должна учитываться.
+# Класс NextDate должен иметь два метода экземпляра:
+#     date() — метод, возвращающий дату следующего дня недели в виде экземпляра класса date
+#     days_until() — метод, возвращающий количество дней до даты следующего дня недели
+# ---------------------------------------------------------------
+from enum import Enum
+from datetime import date, timedelta
+
+class Weekday(Enum):
+    """
+     класс Weekday, описывающий перечисление с днями недели
+    """
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
+
+class NextDate:
+    """
+     класс NextDate, позволяющий определять дату следующего дня недели, начиная с текущего дня
+    """
+    
+    def __init__(self, today: 'date', weekday: 'Weekday', after_today=False) -> None:
+        self.today = today
+        self.weekday = weekday
+        self.after_today = after_today
+
+
+    def date(self):
+        """метод, возвращающий дату следующего дня недели в виде экземпляра класса date"""
+        
+        d = self.today
+        
+        while d.weekday() != self.weekday.value:
+            d += timedelta(days=1)
+        
+        if self.today.weekday() == d.weekday():
+            return d + timedelta(days=7)
+        else:
+            return d 
+
+        
+
+    def days_until(self):
+        """ метод, возвращающий количество дней до даты следующего дня недели"""            
+        day1 = abs((self.today - self.date()).days)
+        
+        if self.today.weekday() == self.date().weekday():
+            return day1 
+        return day1
+        # return  day1 if self.after_today else day1 + 7
+
+
+# ---------------------------------------------------------------
+# НЕ РЕШЕНА
 # ---------------------------------------------------------------
 
 
 
-# 
-# 
-# 
+# Класс OrderStatus
+# 775
+# Реализуйте класс OrderStatus, описывающий флаг с состояниями интернет-заказов. Флаг должен иметь три элемента:
+#     ORDER_PLACED
+#     PAYMENT_RECEIVED
+#     SHIPPING_COMPLETE
 # ---------------------------------------------------------------
 
+from enum import Flag, auto
+
+class OrderStatus(Flag):
+    ORDER_PLACED = auto() 
+    PAYMENT_RECEIVED = auto()
+    SHIPPING_COMPLETE = auto()
 # ---------------------------------------------------------------
+from enum import Flag
 
+OrderStatus = Flag('OrderStatus', ['ORDER_PLACED', 'PAYMENT_RECEIVED', 'SHIPPING_COMPLETE'])
 # ---------------------------------------------------------------
-
-
-
-# 
-# 
-# 
-# ---------------------------------------------------------------
-
-# ---------------------------------------------------------------
-
-# ---------------------------------------------------------------
-
-
-
-# 
-# 
-# 
-# ---------------------------------------------------------------
-
-# ---------------------------------------------------------------
-
+class OrderStatus(Flag):
+    ORDER_PLACED, PAYMENT_RECEIVED, SHIPPING_COMPLETE = (auto() for _ in '...')
 # ---------------------------------------------------------------
 
 
-
-# 
-# 
-# 
+# Классы MovieGenres и Movie
+# 768
+# 1. Реализуйте класс MovieGenres, описывающий флаг с жанрами кино. Флаг должен иметь пять элементов:
+#     ACTION
+#     COMEDY
+#     DRAMA
+#     FANTASY
+#     HORROR
+# 2. Также реализуйте класс Movie, описывающий фильм. При создании экземпляра класс должен принимать два аргумента в следующем порядке:
+#     name — название фильма
+#     genres — жанр фильма (элемент флага MovieGenres)
+# Класс Movie должен иметь один метод экземпляра:
+#     in_genre() — метод, принимающий в качестве аргумента жанр и возвращающий True, если фильм принадлежит данному жанру, или False в противном случае
+# Экземпляр класса Movie должен иметь следующее неформальное строковое представление:
+# <название фильма>
 # ---------------------------------------------------------------
+from enum import Flag, auto
+
+class MovieGenres(Flag):    
+    ACTION = auto()
+    COMEDY = auto()
+    DRAMA = auto()
+    FANTASY = auto()
+    HORROR = auto()
+
+class Movie:
+    def __init__(self, name: str, genres: 'MovieGenres') -> None:
+        self.name = name
+        self.genres = genres
+
 
 # ---------------------------------------------------------------
 
