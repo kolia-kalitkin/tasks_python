@@ -8209,6 +8209,839 @@ def auto_repr(args, kwargs):
 
 
 
+# Класс City
+# 766
+# Вам доступен класс City, описывающий город. При создании экземпляра класс принимает три аргумента в следующем порядке:
+#     name — название города (тип str)
+#     population — население города (тип int)
+#     founded — год основания города (тип int)
+# Экземпляр класса City имеет три атрибута:
+#     name — название города
+#     population — население города
+#     founded — год основания города
+# Также экземпляр класса City имеет следующее формальное строковое представление:
+# City(name='<название города>', population=<население города>, founded=<год основания города>)
+# Наконец, экземпляры класса City поддерживают между собой операцию сравнения с помощью операторов == и !=. Два города считаются равными, если их названия, население и годы основания совпадают.
+# Реализуйте класс City в виде класса данных.
+
+# ----- было ----------------------------------------------------
+class City:
+    def __init__(self, name, population, founded):
+        self.name = name
+        self.population = population
+        self.founded = founded
+
+    def __repr__(self):
+        return f"City(name='{self.name}', population={self.population}, founded={self.founded})"
+
+    def __eq__(self, other):
+        if isinstance(other, City):
+            return (self.name, self.population, self.founded) == (other.name, other.population, other.founded)
+        return NotImplemented
+
+# --------- СТАЛО !!! ------------------------------------------------------
+from dataclasses import dataclass
+
+@dataclass
+class City:   
+        name: str
+        population: int
+        founded :int
+# ---------------------------------------------------------------
+
+
+
+
+# Класс MusicAlbum
+# 754
+# Реализуйте неизменяемый класс MusicAlbum, описывающий музыкальный альбом. При создании экземпляра класс должен принимать четыре аргумента в следующем порядке:
+#     title — название альбома (тип str)
+#     artist — автор альбома (тип str)
+#     genre — жанр альбома (тип str)
+#     year — год выпуска альбома (тип int)
+# Экземпляр класса MusicAlbum должен иметь четыре атрибута:
+#     title — название альбома
+#     artist — автор альбома
+#     genre — жанр альбома
+#     year — год выпуска альбома
+# Также экземпляр класса MusicAlbum должен иметь следующее формальное строковое представление:
+# MusicAlbum(title='<название альбома>', artist='<автор альбома>')
+# Наконец, экземпляры класса MusicAlbum должны поддерживать между собой операцию сравнения с помощью операторов == и!=. Два музыкальных альбома считаются равными, если их названия, авторы и годы выпуска совпадают. 
+# ---------------------------------------------------------------
+from dataclasses import dataclass, field
+
+@dataclass(frozen=True)
+class MusicAlbum:
+    title: str
+    artist: str
+    genre: str = field(repr=False, compare=False)
+    year: int = field(repr=False)
+
+# ------При использовании make_dataclass тоже можно указывать типы значений атрибутов, значения по умолчанию и делать экземпляры класса неизменяемыми.---------------------------------------------------------
+from dataclasses import field, make_dataclass
+
+MusicAlbum = make_dataclass('MusicAlbum',
+                            [('title', str),
+                             ('artist', str),
+                             ('genre', str, field(repr=False, compare=False)),
+                             ('year', int, field(repr=False))],
+                            frozen=True)
+# ---------------------------------------------------------------
+
+
+
+
+# Класс Point
+# 721
+# Реализуйте класс данных Point, описывающий точку на координатной плоскости. При создании экземпляра класс должен принимать два аргумента в следующем порядке:
+#     x — координата точки по оси xx (тип float), по умолчанию имеет значение 0.0
+#     y — координата точки по оси yy (тип float), по умолчанию имеет значение 0.0
+# Экземпляр класса Point должен иметь три атрибута:
+#     x — координата точки по оси xx
+#     y — координата точки по оси yy
+#     quadrant — координатная четверть, к которой принадлежит точка (тип int). Если точка лежит на одной из осей, координатная четверть считается равной 0
+# Класс Point должен иметь два метода экземпляра:
+#     symmetric_x() — метод, возвращающий новый экземпляр класса Point, представляющий точку, симметричную текущей точке относительно оси xx
+#     symmetric_y() — метод, возвращающий новый экземпляр класса Point, представляющий точку, симметричную текущей точке относительно оси yy
+# Экземпляр класса Point должен иметь следующее формальное строковое представление:
+# Point(x=<координата x>, y=<координата y>, quadrant=<координатная четверть>)
+# Наконец, экземпляры класса Point должны поддерживать между собой операцию сравнения с помощью операторов == и!=. Две точки считаются равными, если их координаты по обеим осям совпадают.
+# Примечание 1. Для точки с координатами (x,y)(x,y) симметричной относительно оси xx будем считать точку с координатами (x,−y)(x,−y), симметричной относительно оси yy — точку с координатами (−x,y)(−x,y).
+# Примечание 2. Координатные четверти:
+# ---------------------------------------------------------------
+
+from dataclasses import dataclass, field
+
+@dataclass
+class Point:
+    """
+    класс данных Point, описывающий точку на координатной плоскости
+    """
+    x: int | float  = field(default=0.0)
+    y: int | float = field(default=0.0)
+    quadrant: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        if not self.x or not self.y:
+            self.quadrant = 0
+        elif self.x > 0 and self.y > 0:
+            self.quadrant = 1
+        elif self.x < 0 and self.y > 0:
+            self.quadrant = 2
+        elif self.x < 0 and self.y < 0:
+            self.quadrant = 3
+        elif self.x > 0 and self.y < 0:
+            self.quadrant = 4
+
+    def symmetric_x(self) -> "Point":
+        return Point(self.x, -self.y)
+
+    def symmetric_y(self) -> "Point":
+        return Point(-self.x, self.y)
+# ------преп----------------------------------------------------
+from dataclasses import dataclass, field
+
+
+@dataclass
+class Point:
+    x: float = 0.0
+    y: float = 0.0
+    quadrant: int = field(default=0, compare=False)
+
+    def __post_init__(self):
+        if self.x > 0 and self.y != 0:
+            self.quadrant = (1, 4)[self.y < 0]
+        elif self.x < 0 and self.y != 0:
+            self.quadrant = (2, 3)[self.y < 0]
+
+    def symmetric_x(self):
+        return type(self)(self.x, -self.y)
+
+    def symmetric_y(self):
+        return type(self)(-self.x, self.y)
+# ---------------------------------------------------------------
+
+
+
+
+# Классы FootballPlayer и FootballTeam
+# 719
+# 1. Реализуйте класс данных FootballPlayer, описывающий футбольного игрока. При создании экземпляра класса должен принимать три аргумента в следующем порядке:
+#     name — имя футболиста (тип str)
+#     surname — фамилия футболиста (тип str)
+#     value — рыночная стоимость футболиста в евро (тип int)
+# Экземпляр класса FootballPlayer должен иметь три атрибута:
+#     name — имя футболиста
+#     surname — фамилия футболиста
+#     value — рыночная стоимость футболиста в евро
+# Также экземпляр класса FootballPlayer должен иметь следующее формальное строковое представление:
+# FootballPlayer(name='<имя футболиста>', surname='<фамилия футболиста>')
+# Наконец, экземпляры класса FootballPlayer должны поддерживать между собой все операции сравнения с помощью операторов ==, !=, >, <, >=, <=. Два футболиста считаются равными, если их рыночные стоимости совпадают. Футболист считается больше другого футболиста, если его рыночная стоимость больше.
+# 2. Реализуйте класс данных FootballTeam, описывающий футбольную команду. При создании экземпляра класса должен принимать один аргумент:
+#     name — название команды (тип str)
+# Экземпляр класса FootballTeam должен иметь два атрибута:
+#     name — название команды (тип str)
+#     players — изначально пустой список, содержащий игроков команды (тип list)
+# Класс FootballTeam должен иметь один метод экземпляра:
+#     add_players() — метод, принимающий произвольное количество позиционных аргументов, каждый из которых представляет футболиста, и добавляющий их в команду
+# Также экземпляр класса FootballTeam должен иметь следующее формальное строковое представление:
+# FootballTeam(name='<название футбольной команды>')
+# Наконец, экземпляры класса FootballTeam должны поддерживать между собой операции сравнения с помощью операторов == и !=. Две футбольные команды считаются равными, если их названия совпадают.
+# ---------------------------------------------------------------
+from dataclasses import dataclass, field
+
+
+@dataclass(order=True)
+class FootballPlayer:
+    """
+    класс данных FootballPlayer, описывающий футбольного игрока
+    """
+    
+    name: str = field(compare=False) 
+    surname: str = field(compare=False) 
+    value: int = field(repr=False)
+
+
+
+@dataclass
+class FootballTeam:
+    """
+    класс данных FootballTeam, описывающий футбольную команду
+    """
+    
+    name: str
+    players:  list = field(default_factory=list, compare=False, repr=False)
+
+    
+    def add_players(self, *args) -> None:
+        """метод, принимающий произвольное количество позиционных аргументов, каждый из которых представляет футболиста, и добавляющий их в команду"""
+        self.players.extend(args)
+
+
+# ---------------------------------------------------------------
+from dataclasses import make_dataclass, field
+
+
+FootballPlayer = make_dataclass(
+    'FootballPlayer', [('name', str, field(compare=False)),
+                       ('surname', str, field(compare=False)),
+                       ('value', int, field(repr=False))], 
+    order=True
+)
+
+
+FootballTeam = make_dataclass(
+    'FootballTeam', [('name', str),
+                     ('players', list, field(default_factory=list, compare=False, repr=False))],
+    namespace={'add_players': lambda self, *players: self.players.extend(players)}
+)
+# ---------------------------------------------------------------
+
+
+# ---------------------------------------------------------------
+# ------- решение доп задач -------------------------------------
+# ---------------------------------------------------------------
+# ---------------------------------------------------------------
+
+# Функция anything()
+# 485
+# Реализуйте функцию anything(), которая возвращает такой объект, результат сравнения с которым c помощью операторов ==, !=, >, <, >= и <= всегда равен True.
+# Примечание 1. В тестирующую систему сдайте программу, содержащую только необходимую функцию anything(), но не код, вызывающий ее.
+# ---------------------------------------------------------------
+class Anything:
+    def __eq__(self, __o: object) -> bool:
+        return True
+
+    __ne__ = __lt__ = __gt__ = \
+    __le__ = __ge__ = __eq__
+
+def anything():
+    return Anything()
+
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+# Класс Vector
+# 
+# Реализуйте класс Vector, экземпляр которого представляет собой вектор произвольной размерности. Экземпляр класса Vector должен создаваться на основе собственных координат:
+
+# a = Vector(1, 2, 3)
+# b = Vector(3, 4, 5)
+# c = Vector(5, 6, 7, 8)
+
+# В качестве неформального строкового представления вектор должен иметь собственные координаты, заключенные в круглые скобки:
+
+# print(a)                       # (1, 2, 3)
+# print(b)                       # (3, 4, 5)
+# print(c)                       # (5, 6, 7, 8)
+
+# Векторы должны поддерживать между собой операции сложения, вычитания, произведения и нормирования:
+
+# print(a + b)                   # (4, 6, 8)
+# print(a - b)                   # (-2, -2, -2)
+# print(a * b)                   # 1*3 + 2*4 + 3*5 = 26
+# print(c.norm())                # sqrt(5**2 + 6**2 + 7**2 + 8**2) = sqrt(174) = 13.19090595827292
+
+# а также операции сравнения на равенство и неравенство:
+
+# print(a == Vector(1, 2, 3))    # True
+# print(a == Vector(4, 5, 6))    # False
+
+# При попытке выполнить какую-либо операцию с векторами разной размерности должно быть возбуждено исключение ValueError с текстом:
+
+# Векторы должны иметь равную длину
+# ---------------------------------------------------------------
+
+from math import sqrt
+
+
+
+class Vector:
+                   
+    def __init__(self, *args: "Vector") -> None:
+        self.args = args
+        
+
+    @staticmethod
+    def if_different_len(obj1: "Vector", obj2: "Vector"):
+        if len(obj1) != len(obj2):
+            raise ValueError('Векторы должны иметь равную длину')
+
+
+    def __len__(self) -> int:
+        return len(self.args)
+
+
+    def __str__(self):       
+        return ', '.join(str(i) for i in self.args)
+
+
+    def __add__(self, other) -> "Vector":
+        self.if_different_len(self, other)
+        if isinstance(other, type(self)):    # type(self) или __class__        
+            return Vector(tuple(self.args[i] + other.args[i] for i in range(len(self))))
+        return NotImplemented
+
+
+    def __sub__(self, other) -> "Vector":
+        self.if_different_len(self, other)
+        if isinstance(other, __class__):            
+            return Vector(tuple(self.args[i] - other.args[i] for i in range(len(self))))
+        return NotImplemented
+
+
+    def __mul__(self, other) -> "Vector":
+        self.if_different_len(self, other)
+        if isinstance(other, __class__):    # type(self) или __class__          
+            return Vector(sum(self.args[i] * other.args[i] for i in range(len(self))))
+        return NotImplemented
+            
+
+
+    def norm(self) -> float:               
+        return sqrt(sum(i**2 for i in self.args))
+        
+
+
+    def __eq__(self, other) -> bool:
+        self.if_different_len(self, other)
+        if isinstance(other, type(self)):    # type(self) или __class__  
+            return self.args == other.args
+        return NotImplemented
+
+# ---------------------------------------------------------------
+from operator import sub, mul
+from math import sqrt
+from functools import wraps
+
+class Vector:
+    def __init__(self, *args):
+        self.arguments = args
+
+    def __str__(self):
+        return str(self.arguments)
+
+    
+    @staticmethod
+    def _check_type(func):      # Декоратор что-бы не переписывать одно и тоже в каждый метод:
+        @wraps(func)
+        def wrapper(self, other):
+            if isinstance(other, Vector):
+                if len(self.arguments) != len(other.arguments):
+                    raise ValueError('Векторы должны иметь равную длину')
+
+                return func(self, other)
+            return NotImplemented
+        return wrapper
+
+    @_check_type
+    def __add__(self, other):
+        return type(self)(*map(sum, zip(self.arguments, other.arguments)))
+
+    @_check_type
+    def __sub__(self, other):
+        return type(self)(*map(lambda obj: sub(*obj), zip(self.arguments, other.arguments)))
+
+    @_check_type
+    def __mul__(self, other):
+        return sum(map(lambda obj: mul(*obj), zip(self.arguments, other.arguments)))
+
+    @_check_type
+    def __eq__(self, other):
+        return self.arguments == other.arguments
+
+    def norm(self):
+        return sqrt(sum(x ** 2 for x in self.arguments))
+# ---------------------------------------------------------------
+
+
+
+# Класс CaesarCipher
+# 627
+# Реализуйте класс CaesarCipher для шифровки и дешифровки текста с помощью шифра Цезаря. При создании экземпляра класса CaesarCipher должен указываться сдвиг, который будет использоваться при шифровке и дешифровке. За операцию шифрования должен отвечать метод encode(), за операцию дешифрования — decode():
+# cipher = CaesarCipher(5)
+# print(cipher.encode('Beegeek'))      # Gjjljjp
+# print(cipher.decode('Gjjljjp'))      # Beegeek
+# Обратите внимание, что при шифровке сдвиг должен происходить вправо, также заметьте, что регистр букв при шифровке и дешифровке должен сохраняться.
+# Шифровке и дешифровке должны подвергаться только буквы латинского алфавита, все остальные символы, если они присутствуют, должны оставаться неизменными:
+# print(cipher.encode('Биgeek123'))    # Биljjp123
+# print(cipher.decode('Биljjp123'))    # Биgeek123
+# Примечание 1. Гарантируется, что сдвигом является число из диапазона [1; 26].
+# ---------------------------------------------------------------
+
+    
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+# Классы ArithmeticProgression и GeometricProgression
+# 637
+# Реализуйте класс ArithmeticProgression для генерации членов арифметической прогрессии. При создании экземпляра класса ArithmeticProgression должны указываться первый член последовательности и разность прогрессии:
+# progression = ArithmeticProgression(0, 1)
+# for elem in progression:
+#     if elem > 10:
+#         break
+#     print(elem, end=' ')    # 0 1 2 3 4 5 6 7 8 9 10
+# Обратите внимание, что арифметическая прогрессия должна быть итерируемой, а также бесконечной.
+# Аналогичным образом реализуйте класс GeometricProgression для генерации членов геометрической прогрессии. При создании экземпляра класса GeometricProgression должны указываться первый член последовательности и знаменатель прогрессии:
+# progression = GeometricProgression(1, 2)
+# for elem in progression:
+#     if elem > 10:
+#         break
+#     print(elem, end=' ')    # 1 2 4 8
+# Геометрическая прогрессия, как и арифметическая, должна быть итерируемой, а также бесконечной.
+# ---------------------------------------------------------------
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+
+@dataclass
+class Progression(ABC):
+    first_member: int
+    step: int
+    flag: bool = field(default=None, init=False)
+
+    def __iter__(self): return self
+
+    @abstractmethod
+    def __next__(self):
+        pass
+
+
+
+class ArithmeticProgression(Progression):
+    """
+    класс для генерации членов арифметической прогрессии. 
+    """
+    
+    def __next__(self):        
+        result = self.first_member
+        self.first_member += self.step
+        return result
+        
+
+
+class GeometricProgression(Progression):
+    """
+    класс для генерации членов геометрической прогрессии
+    """
+
+    def __next__(self):        
+        result = self.first_member
+        self.first_member *= self.step
+        return result
+# ---------------------------------------------------------------
+from abc import ABC, abstractmethod
+
+
+class Progression(ABC):
+    def __init__(self, start, step):
+        self._current = start
+        self._step = step
+
+    def __iter__(self):
+        return self
+
+    @abstractmethod
+    def __next__(self):
+        pass
+
+
+class ArithmeticProgression(Progression):
+    def __next__(self):
+        answer = self._current
+        self._current += self._step
+        return answer
+
+
+class GeometricProgression(Progression):
+    def __next__(self):
+        answer = self._current
+        self._current *= self._step
+        return answer
+# ---------------------------------------------------------------
+from __future__ import annotations
+from abc import ABC, abstractmethod
+from operator import add, mul
+
+
+class Progression(ABC):
+    def __init__(self, first: int, step: int) -> None:
+        self.first = first
+        self.step = step
+
+    def __iter__(self) -> Progression:  # from typing import Self (Python 3.11+)
+        return self
+
+    @abstractmethod
+    def __next__(self, func: Callable[[int, int], int]) -> int:
+        next = self.first
+        self.first = func(self.first, self.step)
+        return next
+
+
+class ArithmeticProgression(Progression):
+    def __next__(self) -> int:
+        return super().__next__(add)
+
+class GeometricProgression(Progression):
+    def __next__(self) -> int:
+        return super().__next__(mul)
+# ---------------------------------------------------------------
+import operator
+
+
+class Progression:
+    _func = None
+
+    def __init__(self, start: int, step: int):
+        self._current = start
+        self._step = step
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        result = self._current
+        self._current = self._func(self._current, self._step)
+        return result
+
+
+class ArithmeticProgression(Progression):
+    _func = operator.add
+
+
+class GeometricProgression(Progression):
+    _func = operator.mul
+# ---------------------------------------------------------------
+
+
+
+
+# Классы Domain и DomainException
+# 574
+# Реализуйте класс исключений DomainException. Также реализуйте класс Domain для работы с доменами. Класс Domain должен поддерживать три способа создания своего экземпляра: напрямую через вызов класса, а также с помощью двух методов класса from_url() и from_email():
+# domain1 = Domain('pygen.ru')                       # непосредственно на основе домена
+# domain2 = Domain.from_url('https://pygen.ru')      # на основе url-адреса
+# domain3 = Domain.from_email('support@pygen.ru')    # на основе адреса электронной почты
+# При попытке создания экземпляра класса Domain на основе некорректных домена, url-адреса или адреса электронной почты должно быть возбуждено исключение DomainException с текстом:
+# Недопустимый домен, url или email
+# В качестве неформального строкового представления экземпляр класса Domain должен иметь собственный домен:
+# print(str(domain1))                                # pygen.ru
+# print(str(domain2))                                # pygen.ru
+# print(str(domain3))                                # pygen.ru
+# Примечание 1. Будем считать домен корректным, если он представляет собой последовательность из одной или более латинских букв, за которой следует точка, а затем снова одна или более латинских букв.
+# Примечание 2. Будем считать url-адрес корректным, если он представляет собой строку http:// или https://, за которой следует корректный домен. 
+# Примечание 3. Будем считать адрес электронной почты корректным, если он представляет собой последовательность из одной или более латинских букв, за которой следует собачка (@), а затем корректный домен.
+# ---------------------------------------------------------------
+import re    
+
+
+
+class DomainException(Exception):
+    pass
+
+
+
+
+class Domain:
+
+    __CORRECT_DOMAIN = r'[A-Za-z]+[.][A-Za-z]+'
+
+
+    def __init__(self, string_whis_domain) -> None:        
+        regex = rf'[A-Za-z]*({__class__.__CORRECT_DOMAIN})'   # шаблон домена   
+        self.domain = __class__.is_valid_domain(string_whis_domain, regex)        
+        
+    def __str__(self): return str(self.domain)
+
+    
+    @classmethod
+    def from_url(cls, string_whis_domain: str):
+        regex = fr'https?://({cls.__CORRECT_DOMAIN})'   # шаблон url-адреса     
+        name_domen = cls.is_valid_domain(string_whis_domain, regex)  
+        return  cls(name_domen)
+
+    @classmethod
+    def from_email(cls,string_whis_domain):       
+        regex = fr'[A-Za-z]+\@({cls.__CORRECT_DOMAIN})'   # шаблон email
+        name_domen =cls.is_valid_domain(string_whis_domain, regex)  
+        return  cls(name_domen)
+
+    
+    
+    @staticmethod
+    def is_valid_domain(string_whis_domain, regex):
+        """проверка на корректность имён"""
+            
+        valid_match = re.fullmatch(regex, string_whis_domain)      # проверяем вся ли строка соответствует переданному шаблону
+        search_match = re.search(rf'({__class__.__CORRECT_DOMAIN})', string_whis_domain)    # ищем вхождение домена
+            
+        if valid_match and search_match:
+            value = str(search_match.group(1))            
+            return value         
+        raise DomainException('Недопустимый домен, url или email')  
+                
+# -----тесты 1-----------
+domain1 = Domain('pygen.ru')                       # непосредственно на основе домена
+domain2 = Domain.from_url('https://pygen.ru')      # на основе url-адреса
+domain3 = Domain.from_email('support@pygen.ru')    # на основе адреса электронной почты
+
+print(type(domain1))
+print(type(domain2))
+print(type(domain3))
+# ------2----------------
+domains = ['ip.ru', 'ao.org', 'npo.com', 'npo.com', 'zao.org', 'sibtred.info', 'ao.biz', 'npo.net', 'npo.net',
+           'oao.net', 'zao.com', 'pahomov.org', 'bikova.ru', 'ooo.ru', 'transol.net', 'zao.com', 'rao.info', 'ooo.org',
+           'krjukov.com', 'nikonova.com']
+
+for d in domains:
+    domain = Domain(d)
+    print(domain)
+# ------3----------
+try:
+    domain1 = Domain('12pygen..org')
+except DomainException as e:
+    print(e)
+
+try:
+    domain1 = Domain('https://pygen.ru///')
+except DomainException as e:
+    print(e)
+
+try:
+    domain1 = Domain('1support@pygen.ru')
+except DomainException as e:
+    print(e) 
+# -----преп-----------------------------------------------------
+import re
+
+
+class DomainException(Exception):
+    pass
+
+
+class Domain:
+    __CORRECT_DOMAIN = r'\w+\.\w+'
+    __CORRECT_URL = fr'^https?://(?P<domain>{__CORRECT_DOMAIN})$'
+    __CORRECT_EMAIL = fr'\w+@(?P<domain>{__CORRECT_DOMAIN})'
+
+    def __init__(self, domain):
+        if not re.fullmatch(self.__CORRECT_DOMAIN, domain):
+            raise DomainException('Недопустимый домен, url или email')
+        self.domain = domain
+
+    def __str__(self):
+        return self.domain
+
+    @classmethod
+    def from_url(cls, url):
+        url = re.match(cls.__CORRECT_URL, url)
+        if not url:
+            raise DomainException('Недопустимый домен, url или email')
+        return cls(url.group('domain'))
+
+    @classmethod
+    def from_email(cls, email):
+        email = re.match(cls.__CORRECT_EMAIL, email)
+        if not email:
+            raise DomainException('Недопустимый домен, url или email')
+        return cls(email.group('domain'))
+# ---------------------------------------------------------------
+import re
+
+class DomainException(Exception):
+    pass
+
+class Domain:
+    def __init__(self, domain):
+        self.domain = self.check(domain)
+
+    @staticmethod
+    def check(text):
+        try:
+            return re.fullmatch(r'((http://|https://)|([A-z]+@))?(?P<dom>[A-z]+\.[A-z]+)', text).group('dom')
+        except:
+            raise DomainException('Недопустимый домен, url или email')
+
+    def __str__(self):
+        return str(self.domain)
+
+    @classmethod
+    def from_url(cls, url):
+        return cls(url)
+
+    @classmethod
+    def from_email(cls, email):
+        return cls(email)
+# ---------самое короткое-------------------------------------------------
+import re
+
+
+class DomainException(Exception):
+    pass
+
+
+class Domain:
+    def __init__(self, name):
+        try:
+            self._domain = re.fullmatch(r'^(https?://)?([a-z]+@)?([a-z]+\.[a-z]+)$', name).group(3)
+        except AttributeError:
+            raise DomainException('Недопустимый домен, url или email')
+
+    def __str__(self):
+        return self._domain
+
+    from_url = from_email = lambda name: Domain(name)
+
+# ------без регулярок ---------------------------------------------------------
+class DomainException(Exception):
+    pass
+
+class Domain:
+    def __init__(self, string):
+        if not Domain.is_valid(string):
+            raise DomainException('Недопустимый домен, url или email') 
+        self.value = string
+
+    def __str__(self):
+        return self.value
+    
+    @classmethod
+    def is_valid(cls, string):
+        parts = string.partition('.')
+        return parts[0].isalpha() and parts[2].isalpha()
+    
+    @classmethod
+    def from_url(cls, string):
+        parts = string.partition('://')
+        if parts[0] in ('http', 'https'):
+            return cls(parts[2])
+        raise DomainException('Недопустимый домен, url или email')
+    
+    @classmethod
+    def from_email(cls, string):
+        parts = string.partition('@')
+        if parts[0].isalpha():
+            return cls(parts[2])
+        raise DomainException('Недопустимый домен, url или email')
+
+
+
+
+
+# Класс HighScoreTable
+# 604
+# Предположим, что у нас имеется некоторая игра. За каждую игровую сессию игрок получает определенное количество баллов в зависимости от своего результата. Вашей задачей является реализация класса HighScoreTable — таблицы рекордов, которую можно будет обновлять с учетом итоговых результатов игрока.
+# Изначально таблица рекордов является пустой. Максимальное количество рекордов указывается при создании таблицы:
+# high_score_table = HighScoreTable(3)
+# Таблица должна позволять просматривать текущие рекорды и добавлять новые результаты:
+
+# print(high_score_table.scores)    # []
+# high_score_table.update(10)
+# high_score_table.update(8)
+# high_score_table.update(12)
+# print(high_score_table.scores)    # [12, 10, 8]
+
+# Текущие рекорды всегда должны располагаться в порядке убывания. Так как таблица содержит именно рекорды, то после заполнения таблицы добавляться должны только те результаты, которые лучше текущих:
+
+# high_score_table.update(6)
+# high_score_table.update(7)
+# print(high_score_table.scores)    # [12, 10, 8]
+# high_score_table.update(9)
+# print(high_score_table.scores)    # [12, 10, 9]
+
+# Таблица должна поддерживать сброс всех результатов:
+
+# high_score_table.reset()
+# print(high_score_table.scores)    # []
+# ---------------------------------------------------------------
+class HighScoreTable:
+    """
+    класс HighScoreTable — таблицы рекордов, которую можно будет обновлять с учетом итоговых результатов игрока
+    """
+    def __init__(self, amount: int) -> None:              
+        self.scores = []
+        self._amount = amount    
+
+    
+    def update(self, result: int) -> None:
+        """добавлять новые результаты"""      
+        self.scores.append(result)
+        self.scores.sort(reverse=True)   
+
+        if (len(self.scores) > self._amount):
+            self.scores.pop()
+
+    
+    def reset(self) -> None:
+        """сброс всех результатов"""
+        self.scores.clear()
+
+
+
+
+high_score_table = HighScoreTable(3)
+
+print(high_score_table.scores)
+high_score_table.update(10)
+high_score_table.update(8)
+high_score_table.update(12)
+print(high_score_table.scores)
+
+high_score_table.update(18)
+high_score_table.update(11)
+high_score_table.update(13)
+print(high_score_table.scores)
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
 
 # 
 # 
@@ -8221,6 +9054,16 @@ def auto_repr(args, kwargs):
 
 
 
+# 
+# 
+# 
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
 
 # 
 # 
@@ -8233,6 +9076,16 @@ def auto_repr(args, kwargs):
 
 
 
+# 
+# 
+# 
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
 
 # 
 # 
@@ -8243,6 +9096,27 @@ def auto_repr(args, kwargs):
 
 # ---------------------------------------------------------------
 
+
+
+# 
+# 
+# 
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+
+
+# 
+# 
+# 
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
 
 
 
