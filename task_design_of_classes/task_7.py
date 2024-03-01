@@ -27,12 +27,13 @@
 
 # Примечание 1. Округление процента верных решений должно происходить до ближайшего целого числа.
 # ----------------------------------------------------------
+from dataclasses import dataclass
 
-class Testpaper:
-    def __init__(self, theme_test: str, diagrams_of_correct_answers: str, percentage_of_correct_decisions: str) -> None:
-        self.theme_test = theme_test
-        self.diagrams_of_correct_answers = diagrams_of_correct_answers
-        self.percentage_of_correct_decisions = percentage_of_correct_decisions
+@dataclass
+class Testpaper:    
+    theme_test: str
+    diagrams_of_correct_answers: str
+    percentage_of_correct_decisions: str        
 
 
 
