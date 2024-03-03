@@ -43,7 +43,8 @@ class TicTacToe:
     def __init__(self) -> None:
         self.field_game = [[' '] * 3 for _ in range(3)]
 
-        self.flag = False
+        self.flag1 = False
+        self.flag2 = False
         self.count = 1
         self.winner1 = None
 
@@ -51,92 +52,100 @@ class TicTacToe:
     def check_win(self, object):
         if isinstance(object, list):
             for col in range(3):
-                string1 = ''.join(object[col])
-                # print(string1)
+                string1 = ''.join(object[col])                
 
                 if string1 == 'XXX':
-                    self.flag = True
+                    self.flag1 = True
                     self.winner1 = self._X
                     return self._X
 
                 elif string1 == 'OOO':
-                    self.flag = True
+                    self.flag1 = True
                     self.winner1 = self._O
                     return self._O
 
         elif isinstance(object, str):
             if object == 'XXX':
-                self.flag = True
+                self.flag1 = True
                 self.winner1 = self._X
                 return self._X
 
             elif object == 'OOO':
-                self.flag = True
+                self.flag1 = True
                 self.winner1 = self._O
                 return self._O
 
-    
-    
+        
     def winner(self) -> str:
         """узнаёт победителя игры""" 
-        if self.flag == False and self.count == 9:                
+
+        # ------------------------------------------------
+        # смотрим есть ли победитель по горизонталям
+        # ------------------------------------------------
+        check_result = self.check_win(self.field_game)
+        if check_result:
+            return check_result
+
+        # ------------------------------------------------
+        # смотрим есть ли победитель по вертикалям
+        # ------------------------------------------------
+        lst1 = []
+        lst2 = []
+        for col in range(3):
+            for row in range(3):
+                lst1.append(self.field_game[row][col])
+            lst2.append(lst1)
+            lst1 = []
+
+        check_result = self.check_win(lst2)
+        
+        if check_result:
+            return check_result
+
+        # ------------------------------------------------
+        # смотрим есть ли победитель по главной диагонали
+        # ------------------------------------------------
+        lst3 = []
+        for i in range(3):
+            lst3.append(self.field_game[i][i])
+
+        string1 = ''.join(lst3)
+        
+        check_result = self.check_win(string1)        
+        if check_result:
+            return check_result
+
+        # ------------------------------------------------
+        # смотрим есть ли победитель по побочной диагонали
+        # ------------------------------------------------
+        lst4 = []
+        for i in range(3):
+            lst4.append(self.field_game[i][3 - i - 1])
+
+        string2 = ''.join(lst4)
+        
+        check_result = self.check_win(string2)
+        if check_result:
+            return check_result
+        
+        # ------------------------------------------------
+        # смотрим есть ли НИЧЬЯ
+        # ------------------------------------------------
+        if self.count >= 9 and not self.winner1:
+            self.flag2 = True                
             return 'Ничья'
         
-        else:
-            # смотрим есть ли победитель по горизонталям
-            www = self.check_win(self.field_game)
-            if www:
-                return www
-
-            # смотрим есть ли победитель по вертикалям
-            lst1 = []
-            lst2 = []
-            for col in range(3):
-                for row in range(3):
-                    lst1.append(self.field_game[row][col])
-                lst2.append(lst1)
-                lst1 = []
-
-            # print(lst2)
-            www = self.check_win(lst2)
-            # print(www)
-            if www:
-                return www
-
-            # смотрим есть ли победитель по главной диагонали
-            lst3 = []
-            for i in range(3):
-                lst3.append(self.field_game[i][i])
-
-            string1 = ''.join(lst3)
-            # print(string1)
-            www = self.check_win(string1)
-            # print(www)
-            if www:
-                return www
-
-            # смотрим есть ли победитель по побочной диагонали
-            lst4 = []
-            for i in range(3):
-                lst4.append(self.field_game[i][3 - i - 1])
-
-            string2 = ''.join(lst4)
-            # print(string2)
-            www = self.check_win(string2)
-
-            if www:
-                return www
+                
         return None
 
     
     
     def mark(self, row: int, col: int) -> None:
         row -= 1
-        col -= 1    # т.к. работаем с индексами от 0       
+        col -= 1    # т.к. работаем с индексами от 0            
         
-                
-        
-        if (self.count <= 9) and (self.flag == False): # если есть ходы и нет победителя
+
+        if (self.count <= 9) and (self.flag1 == False): # если есть ходы и нет победителя
                               
             if self.field_game[row][col] == ' ':     # если клетка пустая
                 if self.count % 2:                          # если нечетный ход - крестик, четный - нолик
@@ -144,24 +153,17 @@ class TicTacToe:
                 else:
                     self.field_game[row][col] = self._O
                 
-                self.count += 1      
-            
+                self.count += 1      # считаем ходы 
+                
             else:
                 print('Недоступная клетка')
 
         else:
-            if self.flag: 
+            if self.flag2 or self.flag1: # если есть победитель или ничья
                 print('Игра окончена')
+            
                 
         self.winner() 
-        
-        
-
-
-
-
-       
-    
     
     def show(self) -> None:
         """посмотреть текущее состояние игрового поля"""
