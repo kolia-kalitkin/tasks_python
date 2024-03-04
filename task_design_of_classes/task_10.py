@@ -43,7 +43,7 @@ Self = TypeVar("Self", bound="Currency")
 
 class Currency:
  
-    __CURRENCY_RATE = {
+    __RATE = {
             'EUR': {'EUR': 1, 'USD': 1.1, 'RUB': 90},
             'USD': {'EUR': 1 / 1.1, 'USD': 1,  'RUB': 1 / 1.1 * 90},
             'RUB': {'EUR': 1 / 90, 'USD': 1 / 90 * 1.1, 'RUB': 1}
@@ -102,7 +102,7 @@ class Currency:
 
     def change_to(self, currency: str) -> str:
         """операция конвертации в другую валюту """
-        self.amount = self.amount * self.__CURRENCY_RATE[self.currency][currency]
+        self.amount = self.amount * self.__RATE[self.currency][currency]
         self.currency = currency
         
         return self
