@@ -42,42 +42,38 @@ class TicTacToe:
 
     def __init__(self) -> None:
         self.field_game = [[' '] * 3 for _ in range(3)]
-
-        self.flag1 = False
-        self.flag2 = False
-        self.count = 1
-        self.winner1 = None
+        self.is_winner = False
+        self.is_game_draw = False
+        self.count = 1        
 
     
-    def check_win(self, object):
+    def check_win(self, object: str | list) -> str | None:
+        """функция проверяет есть ли выигрышная комбинация"""
+        
         if isinstance(object, list):
             for col in range(3):
                 string1 = ''.join(object[col])                
 
                 if string1 == 'XXX':
-                    self.flag1 = True
-                    self.winner1 = self._X
+                    self.is_winner = True                    
                     return self._X
 
                 elif string1 == 'OOO':
-                    self.flag1 = True
-                    self.winner1 = self._O
+                    self.is_winner = True                    
                     return self._O
 
         elif isinstance(object, str):
             if object == 'XXX':
-                self.flag1 = True
-                self.winner1 = self._X
+                self.is_winner = True                
                 return self._X
 
             elif object == 'OOO':
-                self.flag1 = True
-                self.winner1 = self._O
+                self.is_winner = True                
                 return self._O
 
         
-    def winner(self) -> str:
-        """узнаёт победителя игры""" 
+    def winner(self) -> str | None:
+        """метод узнаёт победителя игры""" 
 
         # ------------------------------------------------
         # смотрим есть ли победитель по горизонталям
@@ -105,10 +101,8 @@ class TicTacToe:
         # ------------------------------------------------
         # смотрим есть ли победитель по главной диагонали
         # ------------------------------------------------
-        lst3 = []
-        for i in range(3):
-            lst3.append(self.field_game[i][i])
-
+        lst3 = [self.field_game[i][i] for i in range(3)]
+       
         string1 = ''.join(lst3)
         
         check_result = self.check_win(string1)        
@@ -118,9 +112,7 @@ class TicTacToe:
         # ------------------------------------------------
         # смотрим есть ли победитель по побочной диагонали
         # ------------------------------------------------
-        lst4 = []
-        for i in range(3):
-            lst4.append(self.field_game[i][3 - i - 1])
+        lst4 = [self.field_game[i][3 - i - 1] for i in range(3)]       
 
         string2 = ''.join(lst4)
         
@@ -131,22 +123,18 @@ class TicTacToe:
         # ------------------------------------------------
         # смотрим есть ли НИЧЬЯ
         # ------------------------------------------------
-        if self.count >= 9 and not self.winner1:
-            self.flag2 = True                
-            return 'Ничья'
-        
+        if self.count >= 9 and not self.is_winner:
+            self.is_game_draw = True                
+            return 'Ничья'        
                 
         return None
-
     
     
     def mark(self, row: int, col: int) -> None:
         row -= 1
-        col -= 1    # т.к. работаем с индексами от 0            
-        
+        col -= 1    # т.к. работаем с индексами от 0        
 
-        if (self.count <= 9) and (self.flag1 == False): # если есть ходы и нет победителя
-                              
+        if (self.count <= 9) and (self.is_winner == False): # если есть ходы и нет победителя                              
             if self.field_game[row][col] == ' ':     # если клетка пустая
                 if self.count % 2:                          # если нечетный ход - крестик, четный - нолик
                     self.field_game[row][col] = self._X
@@ -157,13 +145,12 @@ class TicTacToe:
                 
             else:
                 print('Недоступная клетка')
-
         else:
-            if self.flag2 or self.flag1: # если есть победитель или ничья
+            if self.is_game_draw or self.is_winner: # если есть победитель или ничья
                 print('Игра окончена')
             
-                
-        self.winner() 
+               
+        self.winner()  # чтобы сразу выявлять победителя
     
     def show(self) -> None:
         """посмотреть текущее состояние игрового поля"""
