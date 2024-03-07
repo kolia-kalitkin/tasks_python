@@ -14,7 +14,7 @@ class roundrobin:
     def __init__(self, *args: Iterable) -> None:
         self.iter_seq = chain(*zip_longest(*args, fillvalue='`j2PgAL#EH70'))
         
-    def __iter__(self) -> Iterable:
+    def __iter__(self):
         return self
     
     def __next__(self) -> Any:       
