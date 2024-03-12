@@ -3159,6 +3159,12 @@ def is_prime(num):
         return False
 
 
+# from sympy import isprime
+# s = [i for i in range(2, int(input())) if isprime(i)]
+# print(*s)
+
+
+
 # считываем данные
 n = int(input())
 
